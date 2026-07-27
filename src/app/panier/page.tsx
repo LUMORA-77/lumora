@@ -1,69 +1,577 @@
+"use client";
+
+import { useRef, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
+import { products } from "@/config/products";
+import { useCart } from "@/context/CartContext";
 
-export default function Panier() {
-  return (
-    <main className="min-h-screen bg-black text-white py-24 px-8">
 
-      <div className="max-w-6xl mx-auto">
+export default function Creer() {
 
-        <h1 className="text-6xl font-black mb-16">
-          Mon panier
-        </h1>
 
-        <div className="bg-[#111] rounded-3xl border border-white/10 p-8 flex flex-col md:flex-row gap-8">
+  const inputRef = useRef<HTMLInputElement>(null);
 
-          <Image
-            src="/images/wallpaper1.jpg"
-            alt="Wallpaper"
-            width={260}
-            height={340}
-            className="rounded-2xl object-cover"
-          />
+  const { addToCart } = useCart();
 
-          <div className="flex-1">
 
-            <h2 className="text-3xl font-bold">
-              Midnight Porsche
-            </h2>
+  const [image,setImage] = useState<File|null>(null);
+  const [preview,setPreview] = useState<string|null>(null);
 
-            <p className="text-gray-400 mt-4">
-              Wallpaper 4K • Téléchargement instantané
-            </p>
+  const [category,setCategory] = useState<any>(null);
+  const [option,setOption] = useState<any>(null);
 
-            <p className="text-yellow-400 text-4xl font-black mt-8">
-              8€
-            </p>
+  const [generated,setGenerated] = useState<string|null>(null);
 
-          </div>
+  const [loading,setLoading] = useState(false);
 
-        </div>
 
-        <div className="mt-12 flex justify-between items-center border-t border-white/10 pt-10">
 
-          <div>
+  function handleImage(file:File){
 
-            <p className="text-gray-400">
-              Total
-            </p>
+    setImage(file);
+    setPreview(URL.createObjectURL(file));
+    setGenerated(null);
 
-            <h2 className="text-5xl font-black">
-              8€
-            </h2>
+  }
 
-          </div>
 
-          <Link
-            href="/checkout"
-            className="bg-yellow-400 text-black px-10 py-5 rounded-full font-bold hover:bg-yellow-300 transition"
-          >
-            Passer au paiement
-          </Link>
 
-        </div>
 
-      </div>
 
-    </main>
-  );
+  async function generate(){
+
+
+    if(!image || !option){
+
+      alert("Choisis une image et un format");
+      return;
+
+    }
+
+
+    setLoading(true);
+
+
+
+    const formData = new FormData();
+
+
+    formData.append(
+      "image",
+      image
+    );
+
+
+    formData.append(
+      "size",
+      option.size
+    );
+
+
+    formData.append(
+      "format",
+      option.format
+    );
+
+
+
+
+
+    try{
+
+
+      const response = await fetch(
+        "/api/generate",
+        {
+          method:"POST",
+          body:formData
+        }
+      );
+
+
+
+      const data = await response.json();
+
+
+
+
+      if(data.success){
+
+
+        setGenerated(data.imageUrl);
+
+
+
+        // AJOUT AUTOMATIQUE AU PANIER
+
+        addToCart({
+
+          image:data.imageUrl,
+
+          name:option.name,
+
+          price:option.price
+
+        });
+
+
+
+        alert(
+          "Création ajoutée au panier 🛒"
+        );
+
+
+      }
+
+      else{
+
+
+        alert(data.error);
+
+
+      }
+
+
+
+    }
+
+    catch(error){
+
+
+      console.error(error);
+
+      alert(
+        "Erreur pendant la génération"
+      );
+
+
+    }
+
+
+
+
+    setLoading(false);
+
+
+  }
+
+
+
+
+
+
+
+return (
+
+<main className="min-h-screen bg-black text-white px-8 py-20">
+
+
+<div className="max-w-6xl mx-auto">
+
+
+
+<p className="text-yellow-400 tracking-[0.5em]">
+LUMORA AI
+</p>
+
+
+
+<h1 className="text-6xl font-black mt-5">
+Crée ton œuvre
+</h1>
+
+
+
+<p className="text-gray-400 text-xl mt-4">
+Transforme ta photo en peinture premium.
+</p>
+
+
+
+
+
+
+<div
+
+onClick={()=>inputRef.current?.click()}
+
+className="
+mt-12
+h-[450px]
+rounded-3xl
+border-2
+border-dashed
+border-yellow-400
+flex
+items-center
+justify-center
+cursor-pointer
+overflow-hidden
+"
+
+>
+
+
+{
+
+preview ?
+
+
+<Image
+
+src={preview}
+
+alt="preview"
+
+width={1000}
+
+height={600}
+
+className="w-full h-full object-contain"
+
+/>
+
+
+
+:
+
+
+<div className="text-center">
+
+
+<div className="text-7xl">
+📸
+</div>
+
+
+<h2 className="text-3xl font-bold mt-5">
+Ajoute ta photo
+</h2>
+
+
+<p className="text-gray-400">
+JPG / PNG
+</p>
+
+
+</div>
+
+
+}
+
+
+</div>
+
+
+
+
+
+
+<input
+
+ref={inputRef}
+
+type="file"
+
+accept="image/*"
+
+hidden
+
+onChange={(e)=>{
+
+if(e.target.files?.[0]){
+
+handleImage(
+e.target.files[0]
+)
+
+}
+
+}}
+
+/>
+
+
+
+
+
+
+
+
+<h2 className="text-3xl font-bold mt-14">
+Choisis ton support
+</h2>
+
+
+
+
+
+<div className="grid md:grid-cols-3 gap-5 mt-8">
+
+
+{
+
+products.map((p)=>(
+
+
+<button
+
+key={p.id}
+
+onClick={()=>{
+
+setCategory(p);
+
+setOption(null);
+
+}}
+
+
+className={`
+p-6
+rounded-3xl
+border
+text-left
+
+${category?.id===p.id
+
+?
+
+"bg-yellow-400 text-black border-yellow-400"
+
+:
+
+"border-zinc-700"
+
+}
+
+`}
+
+
+>
+
+
+<h3 className="text-2xl font-bold">
+{p.name}
+</h3>
+
+
+<p className="mt-2 opacity-70">
+{p.description}
+</p>
+
+
+</button>
+
+
+))
+
+
+}
+
+
+
+</div>
+
+
+
+
+
+
+
+
+{
+
+category &&
+
+
+<div className="mt-12">
+
+
+<h2 className="text-3xl font-bold">
+Choisis le modèle
+</h2>
+
+
+
+
+<div className="grid md:grid-cols-3 gap-5 mt-6">
+
+
+
+{
+
+category.options.map((o:any)=>(
+
+
+
+<button
+
+key={o.name}
+
+onClick={()=>setOption(o)}
+
+
+className={`
+p-5
+rounded-3xl
+border
+text-left
+
+
+${option?.name===o.name
+
+?
+
+"bg-yellow-400 text-black border-yellow-400"
+
+:
+
+"border-zinc-700"
+
+}
+
+`}
+
+
+>
+
+
+<h3 className="text-xl font-bold">
+{o.name}
+</h3>
+
+
+<p>
+{o.format}
+</p>
+
+
+<p className="text-yellow-400 mt-3 font-bold">
+{o.price} €
+</p>
+
+
+</button>
+
+
+
+))
+
+
+}
+
+
+
+</div>
+
+
+
+</div>
+
+
+}
+
+
+
+
+
+
+
+<button
+
+onClick={generate}
+
+disabled={!image || !option || loading}
+
+
+className="
+mt-12
+bg-yellow-400
+text-black
+px-12
+py-5
+rounded-full
+text-xl
+font-bold
+disabled:opacity-40
+"
+
+
+>
+
+{
+
+loading
+
+?
+
+"Création..."
+
+:
+
+option
+
+?
+
+`Créer - ${option.price} €`
+
+:
+
+"Choisir un format"
+
+}
+
+
+</button>
+
+
+
+
+
+
+
+
+{
+
+generated &&
+
+
+<div className="mt-16">
+
+
+<h2 className="text-4xl font-bold mb-6">
+Ton résultat 🎨
+</h2>
+
+
+
+<img
+
+src={generated}
+
+alt="result"
+
+className="rounded-3xl"
+
+/>
+
+
+
+</div>
+
+
+}
+
+
+
+</div>
+
+
+</main>
+
+
+);
+
+
 }

@@ -2,117 +2,511 @@
 
 import { useRef, useState } from "react";
 import Image from "next/image";
+import { products } from "@/config/products";
+
 
 export default function Creer() {
+
+
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const [image, setImage] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState("");
 
-  function handleFile(file: File) {
-    const url = URL.createObjectURL(file);
-    setImage(url);
+  const [image,setImage] = useState<File|null>(null);
+  const [preview,setPreview] = useState<string|null>(null);
+
+  const [category,setCategory] = useState<any>(null);
+  const [option,setOption] = useState<any>(null);
+
+  const [generated,setGenerated] = useState<string|null>(null);
+
+  const [loading,setLoading] = useState(false);
+
+
+
+
+  function handleImage(file:File){
+
+    setImage(file);
+    setPreview(URL.createObjectURL(file));
+    setGenerated(null);
+
   }
 
-  async function generate() {
+
+
+
+
+
+
+  async function generate(){
+
+
+    if(!image || !option){
+
+      alert("Choisis une image et un format");
+      return;
+
+    }
+
+
     setLoading(true);
 
-    try {
-      const res = await fetch("/api/generate", {
-        method: "POST",
-      });
+
+
+    const formData = new FormData();
+
+
+    formData.append(
+      "image",
+      image
+    );
+
+
+    formData.append(
+      "size",
+      option.size
+    );
+
+
+    formData.append(
+      "format",
+      option.format
+    );
+
+
+
+
+    try{
+
+
+      const res = await fetch(
+        "/api/generate",
+        {
+          method:"POST",
+          body:formData
+        }
+      );
+
+
 
       const data = await res.json();
 
-      if (data.success) {
-        setResult(data.result);
-      } else {
-        setResult("Erreur lors de la génération.");
+
+
+      if(data.success){
+
+        setGenerated(data.imageUrl);
+
       }
-    } catch {
-      setResult("Erreur serveur.");
+
+      else{
+
+        alert(data.error);
+
+      }
+
+
+
     }
 
+    catch(e){
+
+      console.log(e);
+      alert("Erreur génération");
+
+    }
+
+
+
     setLoading(false);
+
+
   }
 
+
+
+
+
+
+
+
+
   return (
-    <main className="min-h-screen bg-black text-white">
-      <div className="max-w-6xl mx-auto px-8 py-20">
 
-        <p className="uppercase tracking-[0.5em] text-yellow-400">
-          LUMORA AI
-        </p>
+<main className="min-h-screen bg-black text-white px-8 py-20">
 
-        <h1 className="text-6xl font-black mt-4">
-          Crée ton wallpaper
-        </h1>
 
-        <p className="text-gray-400 text-xl mt-6">
-          Dépose une image puis génère avec l'IA.
-        </p>
+<div className="max-w-6xl mx-auto">
 
-        <div
-          onClick={() => inputRef.current?.click()}
-          className="mt-16 border-2 border-dashed border-yellow-400 rounded-3xl h-[420px] flex items-center justify-center cursor-pointer hover:bg-white/5 transition overflow-hidden"
-        >
-          {!image ? (
-            <div className="text-center">
-              <p className="text-7xl">📷</p>
 
-              <h2 className="text-3xl font-bold mt-6">
-                Clique pour choisir une image
-              </h2>
 
-              <p className="text-gray-400 mt-4">
-                PNG • JPG • WEBP
-              </p>
-            </div>
-          ) : (
-            <div className="relative w-full h-full">
-              <Image
-                src={image}
-                alt="Preview"
-                fill
-                className="object-contain"
-              />
-            </div>
-          )}
-        </div>
+<p className="text-yellow-400 tracking-[0.5em]">
+LUMORA AI
+</p>
 
-        <input
-          ref={inputRef}
-          type="file"
-          accept="image/*"
-          hidden
-          onChange={(e) => {
-            if (!e.target.files?.length) return;
-            handleFile(e.target.files[0]);
-          }}
-        />
 
-        <button
-          onClick={generate}
-          disabled={loading}
-          className="mt-10 bg-yellow-400 text-black px-10 py-5 rounded-full text-xl font-bold hover:scale-105 transition disabled:opacity-50"
-        >
-          {loading ? "Génération..." : "Générer avec l'IA"}
-        </button>
 
-        {result && (
-          <div className="mt-10 p-6 rounded-2xl bg-zinc-900 border border-yellow-400">
-            <h3 className="text-2xl font-bold mb-4">
-              Réponse de l'IA
-            </h3>
+<h1 className="text-6xl font-black mt-5">
+Crée ton œuvre
+</h1>
 
-            <p className="text-lg">
-              {result}
-            </p>
-          </div>
-        )}
 
-      </div>
-    </main>
+<p className="text-gray-400 text-xl mt-4">
+Transforme ta photo en peinture premium.
+</p>
+
+
+
+
+
+
+<div
+
+onClick={()=>inputRef.current?.click()}
+
+className="
+mt-12
+h-[450px]
+rounded-3xl
+border-2
+border-dashed
+border-yellow-400
+flex
+items-center
+justify-center
+cursor-pointer
+overflow-hidden
+"
+
+>
+
+
+
+{
+preview ?
+
+
+<Image
+
+src={preview}
+
+alt="preview"
+
+width={1000}
+
+height={600}
+
+className="w-full h-full object-contain"
+
+/>
+
+
+
+:
+
+
+<div className="text-center">
+
+<div className="text-7xl">
+📸
+</div>
+
+
+<h2 className="text-3xl font-bold mt-5">
+Ajoute ta photo
+</h2>
+
+
+<p className="text-gray-400">
+JPG / PNG
+</p>
+
+
+</div>
+
+
+
+}
+
+
+
+</div>
+
+
+
+
+
+<input
+
+ref={inputRef}
+
+type="file"
+
+accept="image/*"
+
+hidden
+
+onChange={(e)=>{
+
+if(e.target.files?.[0])
+handleImage(e.target.files[0])
+
+}}
+
+/>
+
+
+
+
+
+
+
+
+
+<h2 className="text-3xl font-bold mt-14">
+Choisis ton support
+</h2>
+
+
+
+
+
+<div className="grid md:grid-cols-3 gap-5 mt-8">
+
+
+{
+
+products.map((p)=>
+
+
+<button
+
+key={p.id}
+
+onClick={()=>{
+
+setCategory(p);
+setOption(null);
+
+}}
+
+
+className={`
+p-6
+rounded-3xl
+text-left
+border
+${category?.id===p.id
+?
+"border-yellow-400 bg-yellow-400 text-black"
+:
+"border-gray-700"
+}
+`}
+
+
+>
+
+
+<h3 className="text-2xl font-bold">
+{p.name}
+</h3>
+
+
+<p className="mt-2 opacity-70">
+{p.description}
+</p>
+
+
+</button>
+
+
+)
+
+}
+
+
+
+</div>
+
+
+
+
+
+
+
+
+{
+
+category &&
+
+<div className="mt-12">
+
+
+<h2 className="text-3xl font-bold">
+Choisis ton modèle
+</h2>
+
+
+
+<div className="grid md:grid-cols-3 gap-5 mt-6">
+
+
+
+{
+
+category.options.map((o:any)=>
+
+
+
+<button
+
+key={o.name}
+
+onClick={()=>setOption(o)}
+
+
+className={`
+p-5
+rounded-3xl
+border
+text-left
+
+${option?.name===o.name
+?
+"border-yellow-400 bg-yellow-400 text-black"
+:
+"border-gray-700"
+}
+
+`}
+
+
+>
+
+
+<h3 className="font-bold text-xl">
+{o.name}
+</h3>
+
+
+<p>
+{o.format}
+</p>
+
+
+<p className="mt-3 text-yellow-400 font-bold">
+{o.price} €
+</p>
+
+
+</button>
+
+
+)
+
+
+}
+
+
+
+</div>
+
+
+
+</div>
+
+}
+
+
+
+
+
+
+
+<button
+
+onClick={generate}
+
+disabled={!image || !option || loading}
+
+className="
+mt-12
+bg-yellow-400
+text-black
+px-12
+py-5
+rounded-full
+text-xl
+font-bold
+disabled:opacity-40
+"
+
+
+>
+
+
+{
+
+loading
+?
+"Création..."
+:
+option
+?
+`Créer mon wallpaper - ${option.price}€`
+:
+"Choisir un format"
+
+}
+
+
+</button>
+
+
+
+
+
+
+
+
+
+{
+
+generated &&
+
+<div className="mt-16">
+
+
+<h2 className="text-4xl font-bold mb-6">
+Ton résultat 🎨
+</h2>
+
+
+<img
+
+src={generated}
+
+className="rounded-3xl"
+
+/>
+
+
+</div>
+
+
+}
+
+
+
+
+
+</div>
+
+
+</main>
+
+
   );
+
 }
