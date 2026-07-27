@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: #000;
+  color: white;
+}
+
+::selection {
+  background: #facc15;
+  color: black;
+}
+
+button {
+  cursor: pointer;
+  transition: all .3s ease;
+}
+
+button:hover {
+  transform: translateY(-3px);
+}
+
+a {
+  transition: .25s;
+}
+
+a:hover {
+  color: white;
+}
+
+.hero-bg {
+  animation: zoom 12s ease-in-out infinite alternate;
+}
+
+@keyframes zoom {
+  from {
+    transform: scale(1);
+  }
+
+  to {
+    transform: scale(1.08);
+  }
+}
