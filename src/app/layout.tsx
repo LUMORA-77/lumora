@@ -1,7 +1,7 @@
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { CartProvider } from "@/context/CartContext";
-import Navbar from "@/components/Navbar";
+import Navbar from "@/app/components/Navbar";
 
 export const metadata = {
   title: "Lumora AI",
@@ -18,13 +18,11 @@ export default function RootLayout({
       <html lang="fr">
         <body>
           <CartProvider>
-
             <Navbar />
 
             <main className="pt-28">
               {children}
             </main>
-
           </CartProvider>
         </body>
       </html>
