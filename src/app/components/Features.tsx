@@ -1,55 +1,90 @@
+"use client";
+
+import { motion } from "framer-motion";
+
+const features = [
+  {
+    number: "01",
+    title: "Qualité Ultra HD",
+    text: "Chaque création est optimisée pour iPhone, Android, Mac, PC et impression premium avec une netteté exceptionnelle.",
+  },
+  {
+    number: "02",
+    title: "IA de dernière génération",
+    text: "Une intelligence artificielle transforme vos photos en véritables œuvres d'art avec un rendu réaliste et haut de gamme.",
+  },
+  {
+    number: "03",
+    title: "Livraison instantanée",
+    text: "Votre création est générée en quelques secondes et disponible immédiatement en téléchargement.",
+  },
+];
+
 export default function Features() {
-  const features = [
-    {
-      title: "Qualité 4K",
-      text: "Chaque wallpaper est exporté en très haute résolution pour tous vos appareils.",
-    },
-    {
-      title: "Créé par IA",
-      text: "Des créations uniques générées avec l'intelligence artificielle.",
-    },
-    {
-      title: "Téléchargement instantané",
-      text: "Recevez votre wallpaper immédiatement après votre achat.",
-    },
-  ];
-
   return (
-    <section className="bg-[#080808] py-28">
-      <div className="max-w-7xl mx-auto px-8">
+    <section className="relative overflow-hidden bg-[#080808] py-36">
 
-        <div className="text-center mb-16">
-          <p className="uppercase tracking-[0.4em] text-yellow-400 mb-3">
-            POURQUOI LUMORA
-          </p>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#d4af3715,transparent_55%)]" />
 
-          <h2 className="text-5xl font-black">
+      <div className="relative max-w-7xl mx-auto px-8">
+
+        <div className="text-center">
+
+          <span className="inline-flex rounded-full border border-yellow-400/20 bg-yellow-400/10 px-6 py-2 uppercase tracking-[0.35em] text-xs text-yellow-300">
+            Pourquoi Lumora
+          </span>
+
+          <h2 className="mt-8 text-6xl font-black">
             Une expérience premium
           </h2>
+
+          <p className="mt-8 max-w-3xl mx-auto text-xl leading-9 text-gray-400">
+            Pensé pour offrir une qualité professionnelle,
+            une génération rapide et une expérience haut de gamme.
+          </p>
+
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="mt-24 grid gap-8 lg:grid-cols-3">
 
-          {features.map((feature) => (
+          {features.map((feature, index) => (
 
-            <div
+            <motion.div
               key={feature.title}
-              className="bg-white/5 border border-white/10 rounded-3xl p-10 hover:border-yellow-400 transition"
+              initial={{ opacity: 0, y: 60 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{
+                duration: 0.6,
+                delay: index * 0.1,
+              }}
+              whileHover={{
+                y: -8,
+                scale: 1.02,
+              }}
+              className="rounded-[34px] border border-white/10 bg-gradient-to-b from-white/10 to-white/5 p-10 backdrop-blur-xl"
             >
-              <h3 className="text-2xl font-bold mb-5">
+
+              <p className="text-6xl font-black text-yellow-400/20">
+                {feature.number}
+              </p>
+
+              <h3 className="mt-8 text-3xl font-black">
                 {feature.title}
               </h3>
 
-              <p className="text-gray-400 leading-8">
+              <p className="mt-6 leading-8 text-gray-400">
                 {feature.text}
               </p>
-            </div>
+
+            </motion.div>
 
           ))}
 
         </div>
 
       </div>
+
     </section>
   );
 }

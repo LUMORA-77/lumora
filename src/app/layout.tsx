@@ -1,49 +1,34 @@
 import "./globals.css";
+import { ClerkProvider } from "@clerk/nextjs";
 import { CartProvider } from "@/context/CartContext";
 
-
 export const metadata = {
-
-  title:"Lumora AI",
-
-  description:
-  "Transforme tes photos en œuvres d'art premium"
-
+  title: "Lumora AI",
+  description: "Transforme tes photos en œuvres d'art premium",
 };
 
-
-
-
 export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <ClerkProvider>
 
-children,
+      <html lang="fr">
 
-}:{
+        <body>
 
-children:React.ReactNode
+          <CartProvider>
 
-}){
+            {children}
 
+          </CartProvider>
 
-return (
+        </body>
 
-<html lang="fr">
+      </html>
 
-<body>
-
-
-<CartProvider>
-
-{children}
-
-</CartProvider>
-
-
-</body>
-
-</html>
-
-);
-
-
+    </ClerkProvider>
+  );
 }

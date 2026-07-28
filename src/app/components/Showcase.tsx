@@ -1,43 +1,103 @@
+"use client";
+
 import Image from "next/image";
+import { motion } from "framer-motion";
 
 export default function Showcase() {
   return (
-    <section className="bg-black py-32">
-      <div className="max-w-7xl mx-auto px-8 grid lg:grid-cols-2 gap-20 items-center">
+    <section className="relative overflow-hidden bg-black py-40">
 
-        <div>
-          <p className="uppercase tracking-[0.4em] text-yellow-400 mb-4">
-            Transformez vos photos
-          </p>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#facc1515,transparent_60%)]" />
 
-          <h2 className="text-6xl font-black leading-tight">
-            Une simple photo devient une œuvre d'art.
+      <div className="relative max-w-7xl mx-auto px-8">
+
+        <div className="text-center mb-24">
+
+          <span className="inline-flex rounded-full border border-yellow-400/20 bg-yellow-400/10 px-6 py-2 uppercase tracking-[0.35em] text-xs text-yellow-300">
+            Avant / Après
+          </span>
+
+          <h2 className="mt-8 text-6xl md:text-7xl font-black">
+            Regardez la différence
           </h2>
 
-          <p className="text-gray-400 text-xl mt-8 leading-9">
-            Envoyez votre image, choisissez un style, laissez notre IA créer un wallpaper unique en quelques secondes.
+          <p className="mt-8 max-w-3xl mx-auto text-xl leading-9 text-gray-400">
+            Une simple photo devient une véritable œuvre d'art
+            grâce à l'intelligence artificielle de Lumora.
           </p>
 
-          <button className="mt-12 bg-yellow-400 text-black px-8 py-4 rounded-full font-bold hover:scale-105 transition">
-            Créer mon wallpaper
-          </button>
         </div>
 
-        <div className="relative">
+        <div className="grid lg:grid-cols-2 gap-12">
 
-          <div className="absolute -inset-4 bg-yellow-400/20 blur-3xl rounded-3xl"></div>
+          <motion.div
+            initial={{ opacity: 0, x: -80 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="overflow-hidden rounded-[36px] border border-white/10 bg-white/5 backdrop-blur-xl"
+          >
 
-          <Image
-            src="/images/wallpaper1.jpg"
-            alt="Wallpaper"
-            width={700}
-            height={900}
-            className="relative rounded-3xl shadow-2xl"
-          />
+            <div className="relative h-[650px]">
+
+              <Image
+                src="/images/before.jpg"
+                alt="Avant"
+                fill
+                className="object-cover"
+              />
+
+            </div>
+
+            <div className="p-8">
+
+              <span className="text-gray-400 uppercase tracking-[0.3em]">
+                Avant
+              </span>
+
+              <h3 className="mt-3 text-3xl font-black">
+                Photo originale
+              </h3>
+
+            </div>
+
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 80 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="overflow-hidden rounded-[36px] border border-yellow-400/20 bg-gradient-to-b from-yellow-400/10 to-white/5 backdrop-blur-xl"
+          >
+
+            <div className="relative h-[650px]">
+
+              <Image
+                src="/images/after.jpg"
+                alt="Après"
+                fill
+                className="object-cover"
+              />
+
+            </div>
+
+            <div className="p-8">
+
+              <span className="text-yellow-400 uppercase tracking-[0.3em]">
+                Après
+              </span>
+
+              <h3 className="mt-3 text-3xl font-black">
+                Création Lumora
+              </h3>
+
+            </div>
+
+          </motion.div>
 
         </div>
 
       </div>
+
     </section>
   );
 }

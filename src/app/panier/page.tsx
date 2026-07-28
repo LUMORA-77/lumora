@@ -1,577 +1,215 @@
 "use client";
 
-import { useRef, useState } from "react";
+import Navbar from "@/app/components/Navbar";
 import Image from "next/image";
-import { products } from "@/config/products";
+import Link from "next/link";
 import { useCart } from "@/context/CartContext";
+import { loadStripe } from "@stripe/stripe-js";
 
-
-export default function Creer() {
-
-
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const { addToCart } = useCart();
-
-
-  const [image,setImage] = useState<File|null>(null);
-  const [preview,setPreview] = useState<string|null>(null);
-
-  const [category,setCategory] = useState<any>(null);
-  const [option,setOption] = useState<any>(null);
-
-  const [generated,setGenerated] = useState<string|null>(null);
-
-  const [loading,setLoading] = useState(false);
-
-
-
-  function handleImage(file:File){
-
-    setImage(file);
-    setPreview(URL.createObjectURL(file));
-    setGenerated(null);
-
-  }
-
-
-
-
-
-  async function generate(){
-
-
-    if(!image || !option){
-
-      alert("Choisis une image et un format");
-      return;
-
-    }
-
-
-    setLoading(true);
-
-
-
-    const formData = new FormData();
-
-
-    formData.append(
-      "image",
-      image
-    );
-
-
-    formData.append(
-      "size",
-      option.size
-    );
-
-
-    formData.append(
-      "format",
-      option.format
-    );
-
-
-
-
-
-    try{
-
-
-      const response = await fetch(
-        "/api/generate",
-        {
-          method:"POST",
-          body:formData
-        }
-      );
-
-
-
-      const data = await response.json();
-
-
-
-
-      if(data.success){
-
-
-        setGenerated(data.imageUrl);
-
-
-
-        // AJOUT AUTOMATIQUE AU PANIER
-
-        addToCart({
-
-          image:data.imageUrl,
-
-          name:option.name,
-
-          price:option.price
-
-        });
-
-
-
-        alert(
-          "Création ajoutée au panier 🛒"
-        );
-
-
-      }
-
-      else{
-
-
-        alert(data.error);
-
-
-      }
-
-
-
-    }
-
-    catch(error){
-
-
-      console.error(error);
-
-      alert(
-        "Erreur pendant la génération"
-      );
-
-
-    }
-
-
-
-
-    setLoading(false);
-
-
-  }
-
-
-
-
-
-
-
-return (
-
-<main className="min-h-screen bg-black text-white px-8 py-20">
-
-
-<div className="max-w-6xl mx-auto">
-
-
-
-<p className="text-yellow-400 tracking-[0.5em]">
-LUMORA AI
-</p>
-
-
-
-<h1 className="text-6xl font-black mt-5">
-Crée ton œuvre
-</h1>
-
-
-
-<p className="text-gray-400 text-xl mt-4">
-Transforme ta photo en peinture premium.
-</p>
-
-
-
-
-
-
-<div
-
-onClick={()=>inputRef.current?.click()}
-
-className="
-mt-12
-h-[450px]
-rounded-3xl
-border-2
-border-dashed
-border-yellow-400
-flex
-items-center
-justify-center
-cursor-pointer
-overflow-hidden
-"
-
->
-
-
-{
-
-preview ?
-
-
-<Image
-
-src={preview}
-
-alt="preview"
-
-width={1000}
-
-height={600}
-
-className="w-full h-full object-contain"
-
-/>
-
-
-
-:
-
-
-<div className="text-center">
-
-
-<div className="text-7xl">
-📸
-</div>
-
-
-<h2 className="text-3xl font-bold mt-5">
-Ajoute ta photo
-</h2>
-
-
-<p className="text-gray-400">
-JPG / PNG
-</p>
-
-
-</div>
-
-
-}
-
-
-</div>
-
-
-
-
-
-
-<input
-
-ref={inputRef}
-
-type="file"
-
-accept="image/*"
-
-hidden
-
-onChange={(e)=>{
-
-if(e.target.files?.[0]){
-
-handleImage(
-e.target.files[0]
-)
-
-}
-
-}}
-
-/>
-
-
-
-
-
-
-
-
-<h2 className="text-3xl font-bold mt-14">
-Choisis ton support
-</h2>
-
-
-
-
-
-<div className="grid md:grid-cols-3 gap-5 mt-8">
-
-
-{
-
-products.map((p)=>(
-
-
-<button
-
-key={p.id}
-
-onClick={()=>{
-
-setCategory(p);
-
-setOption(null);
-
-}}
-
-
-className={`
-p-6
-rounded-3xl
-border
-text-left
-
-${category?.id===p.id
-
-?
-
-"bg-yellow-400 text-black border-yellow-400"
-
-:
-
-"border-zinc-700"
-
-}
-
-`}
-
-
->
-
-
-<h3 className="text-2xl font-bold">
-{p.name}
-</h3>
-
-
-<p className="mt-2 opacity-70">
-{p.description}
-</p>
-
-
-</button>
-
-
-))
-
-
-}
-
-
-
-</div>
-
-
-
-
-
-
-
-
-{
-
-category &&
-
-
-<div className="mt-12">
-
-
-<h2 className="text-3xl font-bold">
-Choisis le modèle
-</h2>
-
-
-
-
-<div className="grid md:grid-cols-3 gap-5 mt-6">
-
-
-
-{
-
-category.options.map((o:any)=>(
-
-
-
-<button
-
-key={o.name}
-
-onClick={()=>setOption(o)}
-
-
-className={`
-p-5
-rounded-3xl
-border
-text-left
-
-
-${option?.name===o.name
-
-?
-
-"bg-yellow-400 text-black border-yellow-400"
-
-:
-
-"border-zinc-700"
-
-}
-
-`}
-
-
->
-
-
-<h3 className="text-xl font-bold">
-{o.name}
-</h3>
-
-
-<p>
-{o.format}
-</p>
-
-
-<p className="text-yellow-400 mt-3 font-bold">
-{o.price} €
-</p>
-
-
-</button>
-
-
-
-))
-
-
-}
-
-
-
-</div>
-
-
-
-</div>
-
-
-}
-
-
-
-
-
-
-
-<button
-
-onClick={generate}
-
-disabled={!image || !option || loading}
-
-
-className="
-mt-12
-bg-yellow-400
-text-black
-px-12
-py-5
-rounded-full
-text-xl
-font-bold
-disabled:opacity-40
-"
-
-
->
-
-{
-
-loading
-
-?
-
-"Création..."
-
-:
-
-option
-
-?
-
-`Créer - ${option.price} €`
-
-:
-
-"Choisir un format"
-
-}
-
-
-</button>
-
-
-
-
-
-
-
-
-{
-
-generated &&
-
-
-<div className="mt-16">
-
-
-<h2 className="text-4xl font-bold mb-6">
-Ton résultat 🎨
-</h2>
-
-
-
-<img
-
-src={generated}
-
-alt="result"
-
-className="rounded-3xl"
-
-/>
-
-
-
-</div>
-
-
-}
-
-
-
-</div>
-
-
-</main>
-
-
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!
 );
 
+export default function Panier() {
+
+  const {
+    cart,
+    removeFromCart,
+    clearCart,
+  } = useCart();
+
+  const total = cart.reduce(
+    (sum, item) => sum + item.price,
+    0
+  );
+
+  async function checkout() {
+
+    const res = await fetch("/api/checkout", {
+
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json",
+      },
+
+      body: JSON.stringify({
+        cart,
+      }),
+
+    });
+
+    const data = await res.json();
+
+    console.log(data);
+
+    if (data.url) {
+
+      window.location.href = data.url;
+
+    } else {
+
+      alert("Erreur Stripe");
+
+    }
+
+  }
+
+  return (
+
+    <>
+
+      <Navbar />
+
+      <main className="min-h-screen bg-[#050505] text-white pt-36">
+
+        <div className="max-w-7xl mx-auto px-8">
+
+          <h1 className="text-6xl font-black">
+
+            Mon panier
+
+          </h1>
+
+          <p className="mt-4 text-xl text-gray-400">
+
+            {cart.length} article(s)
+
+          </p>
+
+          {cart.length === 0 ? (
+
+            <div className="mt-24 text-center">
+
+              <h2 className="text-4xl font-bold">
+
+                Ton panier est vide
+
+              </h2>
+
+              <p className="mt-6 text-gray-400">
+
+                Découvre nos wallpapers premium.
+
+              </p>
+
+              <Link
+                href="/boutique"
+                className="inline-block mt-10 rounded-full bg-yellow-400 px-10 py-4 font-bold text-black"
+              >
+                Explorer la boutique
+              </Link>
+
+            </div>
+
+          ) : (
+
+            <>
+                          <div className="mt-14 space-y-8">
+
+                {cart.map((item) => (
+
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl"
+                  >
+
+                    <div className="flex items-center gap-6">
+
+                      <div className="relative h-32 w-32 overflow-hidden rounded-2xl">
+
+                        <Image
+                          src={item.image}
+                          alt={item.title}
+                          fill
+                          className="object-cover"
+                        />
+
+                      </div>
+
+                      <div>
+
+                        <h2 className="text-3xl font-black">
+
+                          {item.title}
+
+                        </h2>
+
+                        <p className="mt-3 text-2xl font-black text-yellow-400">
+
+                          {item.price}€
+
+                        </p>
+
+                      </div>
+
+                    </div>
+
+                    <button
+                      onClick={() => removeFromCart(item.id)}
+                      className="rounded-full border border-red-500 px-6 py-3 text-red-400 transition hover:bg-red-500 hover:text-white"
+                    >
+                      Supprimer
+                    </button>
+
+                  </div>
+
+                ))}
+
+              </div>
+
+              <div className="mt-16 rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
+
+                <div className="flex items-center justify-between">
+
+                  <div>
+
+                    <p className="text-gray-400">
+
+                      Total
+
+                    </p>
+
+                    <h2 className="mt-2 text-5xl font-black text-yellow-400">
+
+                      {total}€
+
+                    </h2>
+
+                  </div>
+
+                  <div className="flex gap-4">
+
+                    <button
+                      onClick={clearCart}
+                      className="rounded-full border border-white/10 px-8 py-4 transition hover:bg-white hover:text-black"
+                    >
+                      Vider
+                    </button>
+
+                    <button
+                      onClick={checkout}
+                      className="rounded-full bg-yellow-400 px-10 py-4 font-bold text-black transition hover:scale-105"
+                    >
+                      Passer au paiement
+                    </button>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </>
+
+          )}
+
+        </div>
+
+      </main>
+
+    </>
+
+  );
 
 }

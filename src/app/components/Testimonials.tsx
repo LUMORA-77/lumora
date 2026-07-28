@@ -1,63 +1,101 @@
+"use client";
+
+import { motion } from "framer-motion";
+
+const reviews = [
+  {
+    name: "Lucas M.",
+    role: "Client Premium",
+    text: "Le résultat est incroyable. J'ai transformé une vieille photo de ma Porsche en un wallpaper digne d'une affiche de cinéma.",
+    rating: "★★★★★",
+  },
+  {
+    name: "Emma R.",
+    role: "Créatrice",
+    text: "Qualité exceptionnelle. Je l'ai imprimé en grand format et le rendu est bluffant.",
+    rating: "★★★★★",
+  },
+  {
+    name: "Nathan D.",
+    role: "Photographe",
+    text: "Franchement je ne pensais pas que l'IA pouvait produire un résultat aussi propre. Très premium.",
+    rating: "★★★★★",
+  },
+];
+
 export default function Testimonials() {
-  const reviews = [
-    {
-      name: "Lucas",
-      text: "Incroyable qualité. Mon fond d'écran est magnifique sur mon Mac.",
-    },
-    {
-      name: "Emma",
-      text: "Très simple à utiliser et le rendu IA est vraiment impressionnant.",
-    },
-    {
-      name: "Nathan",
-      text: "Je ne pensais pas qu'une photo pouvait devenir un wallpaper aussi stylé.",
-    },
-  ];
-
   return (
-    <section className="bg-[#090909] py-28">
-      <div className="max-w-7xl mx-auto px-8">
+    <section className="relative overflow-hidden bg-[#060606] py-36">
 
-        <div className="text-center mb-16">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#facc1510,transparent_60%)]" />
 
-          <p className="uppercase tracking-[0.4em] text-yellow-400 mb-4">
-            ILS NOUS FONT CONFIANCE
-          </p>
+      <div className="relative max-w-7xl mx-auto px-8">
 
-          <h2 className="text-5xl font-black">
-            Ce que disent nos clients
+        <div className="text-center">
+
+          <span className="inline-flex rounded-full border border-yellow-400/20 bg-yellow-400/10 px-6 py-2 uppercase tracking-[0.35em] text-xs text-yellow-300">
+            Avis clients
+          </span>
+
+          <h2 className="mt-8 text-6xl font-black">
+            Ils adorent Lumora
           </h2>
+
+          <p className="mt-8 max-w-3xl mx-auto text-xl leading-9 text-gray-400">
+            Des centaines de créations réalisées avec une qualité
+            exceptionnelle.
+          </p>
 
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="mt-24 grid gap-8 lg:grid-cols-3">
 
-          {reviews.map((review) => (
+          {reviews.map((review, index) => (
 
-            <div
+            <motion.div
               key={review.name}
-              className="bg-white/5 border border-white/10 rounded-3xl p-8 hover:border-yellow-400 transition"
+              initial={{ opacity: 0, y: 60 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{
+                duration: 0.6,
+                delay: index * 0.12,
+              }}
+              whileHover={{
+                y: -8,
+                scale: 1.02,
+              }}
+              className="rounded-[34px] border border-white/10 bg-gradient-to-b from-white/10 to-white/5 p-10 backdrop-blur-xl"
             >
 
-              <div className="text-yellow-400 text-3xl mb-5">
-                ★★★★★
-              </div>
+              <p className="text-2xl text-yellow-400">
+                {review.rating}
+              </p>
 
-              <p className="text-gray-300 leading-8">
+              <p className="mt-8 leading-8 text-gray-300">
                 "{review.text}"
               </p>
 
-              <h3 className="mt-8 font-bold text-xl">
-                {review.name}
-              </h3>
+              <div className="mt-10">
 
-            </div>
+                <h3 className="text-xl font-bold">
+                  {review.name}
+                </h3>
+
+                <p className="text-gray-500">
+                  {review.role}
+                </p>
+
+              </div>
+
+            </motion.div>
 
           ))}
 
         </div>
 
       </div>
+
     </section>
   );
 }

@@ -1,100 +1,102 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import {
+createContext,
+useContext,
+useState
+} from "react";
 
+type CartItem={
 
-const CartContext = createContext<any>(null);
+id:number;
+title:string;
+price:number;
+image:string;
 
+};
 
+type CartContextType={
+
+cart:CartItem[];
+
+addToCart:(item:CartItem)=>void;
+
+removeFromCart:(id:number)=>void;
+
+clearCart:()=>void;
+
+};
+
+const CartContext=createContext<CartContextType>({
+
+cart:[],
+
+addToCart:()=>{},
+
+removeFromCart:()=>{},
+
+clearCart:()=>{}
+
+});
 
 export function CartProvider({
-  children
-}: {
-  children: React.ReactNode;
-}) {
 
+children,
 
-  const [cart, setCart] = useState<any[]>([]);
+}:{
 
+children:React.ReactNode
 
+}){
 
-  function addToCart(item:any){
+const [cart,setCart]=useState<CartItem[]>([]);
 
-    setCart((prev)=>[
-      ...prev,
-      item
-    ]);
+function addToCart(item:CartItem){
 
-  }
-
-
-
-
-  function removeFromCart(index:number){
-
-    setCart((prev)=>
-      prev.filter((_,i)=>i !== index)
-    );
-
-  }
-
-
-
-
-
-  function clearCart(){
-
-    setCart([]);
-
-  }
-
-
-
-
-
-  function total(){
-
-    return cart.reduce(
-      (sum,item)=>sum + item.price,
-      0
-    );
-
-  }
-
-
-
-
-
-  return (
-
-    <CartContext.Provider
-
-      value={{
-        cart,
-        addToCart,
-        removeFromCart,
-        clearCart,
-        total
-      }}
-
-    >
-
-      {children}
-
-    </CartContext.Provider>
-
-  );
-
+setCart(prev=>[...prev,item]);
 
 }
 
+function removeFromCart(id:number){
 
+setCart(prev=>prev.filter(i=>i.id!==id));
 
+}
 
+function clearCart(){
 
+setCart([]);
+
+}
+
+return(
+
+<CartContext.Provider
+
+value={{
+
+cart,
+
+addToCart,
+
+removeFromCart,
+
+clearCart
+
+}}
+
+>
+
+{children}
+
+</CartContext.Provider>
+
+);
+
+}
 
 export function useCart(){
 
-  return useContext(CartContext);
+return useContext(CartContext);
 
 }
